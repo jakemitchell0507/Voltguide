@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltGuide Pro</title>
+
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    background: #f2f2f7;
+}
+
+header {
+    padding: 18px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    background: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.container {
+    padding: 16px;
+    max-width: 520px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    padding: 18px;
+    margin-bottom: 14px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+h2 { margin-top: 0; }
+
+input, select {
+    width: 100%;
+    padding: 14px;
+    margin: 6px 0;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: none;
+    background: #007aff;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.result {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+}
+
+.lock {
+    text-align: center;
+    color: #007aff;
+    font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<header>VoltGuide Pro – UK</header>
+
+<div class="container">
+
+<!-- Voltage Drop -->
+<div class="card">
+<h2>Voltage Drop</h2>
+<input id="len" placeholder="Length (m)">
+<input id="amps" placeholder="Current (A)">
+<select id="cable">
+<option value="">Cable size</option>
+<option value="7.3">1.5 mm²</option>
+<option value="4.4">2.5 mm²</option>
+<option value="2.8">4 mm²</option>
+<option value="1.8">6 mm²</option>
+</select>
+<button onclick="vd()">Calculate</button>
+<div class="result" id="vdOut"></div>
+</div>
+
+<!-- Zs Max Lookup (PRO preview) -->
+<div class="card">
+<h2>Zs Max (Type B MCB)</h2>
+<select id="zs">
+<option value="">Breaker rating</option>
+<option value="7.67">6A</option>
+<option value="3.83">16A</option>
+<option value="1.92">32A</option>
+</select>
+<button onclick="zs()">Show Zs</button>
+<div class="result" id="zsOut"></div>
+<div class="lock">Full testing tools in Pro</div>
+</div>
+
+<!-- Simple EIC Helper -->
+<div class="card">
+<h2>Minor Works Checklist</h2>
+<button onclick="eic()">Show Steps</button>
+<div class="result" id="eicOut"></div>
+</div>
+
+</div>
+
+<script>
+function vd() {
+    let L = parseFloat(len.value);
+    let I = parseFloat(amps.value);
+    let mV = parseFloat(cable.value);
+    if (!L || !I || !mV) return;
+    vdOut.innerText = ((mV * I * L) / 1000).toFixed(2) + " V drop";
+}
+
+function zs() {
+    if (!zs.value) return;
+    zsOut.innerText = "Max Zs: " + zs.value + " Ω";
+}
+
+function eic() {
+    eicOut.innerText =
+        "1. Isolate supply → 2. Test polarity → 3. Measure Zs → 4. Record results → 5. Sign certificate";
+}
+</script>
+
+</body>
+</html>
