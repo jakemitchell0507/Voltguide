@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoltGuide Pro v10</title>
+<title>VoltGuide Pro v11</title>
+
+<!-- jsPDF for real PDF certificates -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body {
@@ -24,7 +27,7 @@ button {
   margin: 10px auto;
   padding: 12px;
   width: 80%;
-  max-width: 300px;
+  max-width: 320px;
   border: none;
   border-radius: 10px;
   background: #2563eb;
@@ -35,7 +38,7 @@ button {
 
 input, select {
   width: 80%;
-  max-width: 300px;
+  max-width: 320px;
   padding: 10px;
   margin: 8px auto;
   display: block;
@@ -54,21 +57,23 @@ li { margin: 8px 0; }
 <body>
 
 <header>
-<h1>⚡ VoltGuide Pro v10</h1>
+<h1>⚡ VoltGuide Pro v11</h1>
 </header>
 
 <main>
 
+<!-- HOME -->
 <section id="home" class="screen active">
 <button onclick="showScreen('voltage')">Voltage Drop</button>
 <button onclick="showScreen('fault')">Distance to Fault</button>
 <button onclick="showScreen('zs')">Max Zs Lookup</button>
-<button onclick="showScreen('certificate')">Test Certificate</button>
+<button onclick="showScreen('certificate')">Generate EIC PDF</button>
 <button onclick="showScreen('history')">Saved Results</button>
 </section>
 
+<!-- VOLTAGE DROP -->
 <section id="voltage" class="screen">
-<h2>Voltage Drop</h2>
+<h2>Voltage Drop Calculator</h2>
 
 <select id="cable">
 <option value="1.5">1.5 mm²</option>
@@ -87,11 +92,12 @@ li { margin: 8px 0; }
 <button onclick="showScreen('home')">Back</button>
 </section>
 
+<!-- FAULT -->
 <section id="fault" class="screen">
 <h2>Distance to Fault</h2>
 
-<input id="faultDrop" type="number" placeholder="Voltage Drop (V)">
-<input id="faultRes" type="number" step="0.001" placeholder="Resistance (Ω/m)">
+<input id="faultDrop" type="number" placeholder="Measured Voltage Drop (V)">
+<input id="faultRes" type="number" step="0.001" placeholder="Cable Resistance (Ω/m)">
 
 <button onclick="calcFault()">Calculate</button>
 <p id="faultResult"></p>
@@ -100,6 +106,7 @@ li { margin: 8px 0; }
 <button onclick="showScreen('home')">Back</button>
 </section>
 
+<!-- ZS -->
 <section id="zs" class="screen">
 <h2>Max Zs Lookup</h2>
 
@@ -122,18 +129,20 @@ li { margin: 8px 0; }
 <button onclick="showScreen('home')">Back</button>
 </section>
 
+<!-- CERTIFICATE -->
 <section id="certificate" class="screen">
-<h2>Test Certificate</h2>
+<h2>Electrical Installation Certificate (EIC)</h2>
 
 <input id="clientName" placeholder="Client Name">
 <input id="clientAddress" placeholder="Address">
-<input id="circuit" placeholder="Circuit">
-<input id="result" placeholder="Result">
+<input id="circuit" placeholder="Circuit Description">
+<input id="result" placeholder="Test Result">
 
-<button onclick="downloadCertificate()">Download Certificate</button>
+<button onclick="downloadCertificate()">Download EIC PDF</button>
 <button onclick="showScreen('home')">Back</button>
 </section>
 
+<!-- HISTORY -->
 <section id="history" class="screen">
 <h2>Saved Results</h2>
 <ul id="historyList"></ul>
@@ -151,6 +160,7 @@ function showScreen(id) {
   if (id === "history") loadHistory();
 }
 
+/* Voltage Drop */
 function calcVoltage() {
   const cable = parseFloat(document.getElementById("cable").value);
   const length = parseFloat(document.getElementById("length").value);
@@ -160,10 +170,12 @@ function calcVoltage() {
   if (!length || !current) return;
 
   const vd = map[cable] * length * current;
+
   document.getElementById("voltageResult").textContent =
     "Voltage Drop: " + vd.toFixed(2) + " V";
 }
 
+/* Fault Distance */
 function calcFault() {
   const drop = parseFloat(document.getElementById("faultDrop").value);
   const res = parseFloat(document.getElementById("faultRes").value);
@@ -173,6 +185,7 @@ function calcFault() {
     "Estimated Distance: " + (drop / res).toFixed(1) + " m";
 }
 
+/* Max Zs */
 function calcZs() {
   const type = document.getElementById("breakerType").value;
   const rating = document.getElementById("breakerRating").value;
@@ -187,6 +200,7 @@ function calcZs() {
     "Max Zs: " + table[type][rating] + " Ω";
 }
 
+/* Save History */
 function saveResult(type, text) {
   if (!text) return;
   const data = JSON.parse(localStorage.getItem("voltguide") || "[]");
@@ -211,24 +225,30 @@ function clearHistory() {
   loadHistory();
 }
 
-function downloadCertificate() {
-  const text = `
-Electrical Test Certificate
+/* REAL EIC PDF */
+async function downloadCertificate() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-Client: ${clientName.value}
-Address: ${clientAddress.value}
+  const name = document.getElementById("clientName").value;
+  const address = document.getElementById("clientAddress").value;
+  const circuit = document.getElementById("circuit").value;
+  const result = document.getElementById("result").value;
 
-Circuit: ${circuit.value}
-Result: ${result.value}
+  doc.setFontSize(18);
+  doc.text("Electrical Installation Certificate (EIC)", 20, 20);
 
-Generated by VoltGuide Pro v10
-`;
+  doc.setFontSize(12);
+  doc.text("Client Name: " + name, 20, 40);
+  doc.text("Address: " + address, 20, 50);
 
-  const blob = new Blob([text], {type:"text/plain"});
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "certificate.txt";
-  link.click();
+  doc.text("Circuit: " + circuit, 20, 70);
+  doc.text("Test Result: " + result, 20, 80);
+
+  doc.text("Generated by VoltGuide Pro", 20, 110);
+  doc.text(new Date().toLocaleDateString(), 150, 110);
+
+  doc.save("EIC-Certificate.pdf");
 }
 </script>
 
