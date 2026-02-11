@@ -3,10 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoltGuide Pro v11</title>
-
-<!-- jsPDF for real PDF certificates -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<title>VoltGuide Pro v13</title>
 
 <style>
 body {
@@ -16,240 +13,224 @@ body {
   color: white;
   text-align: center;
 }
-
-header {
-  background: #020617;
-  padding: 15px;
-}
+header { background:#020617; padding:15px; }
 
 button {
-  display: block;
-  margin: 10px auto;
-  padding: 12px;
-  width: 80%;
-  max-width: 320px;
-  border: none;
-  border-radius: 10px;
-  background: #2563eb;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
+  display:block; margin:10px auto; padding:12px;
+  width:80%; max-width:320px;
+  border:none; border-radius:10px;
+  background:#2563eb; color:white; font-size:16px;
 }
 
 input, select {
-  width: 80%;
-  max-width: 320px;
-  padding: 10px;
-  margin: 8px auto;
-  display: block;
-  border-radius: 8px;
-  border: none;
+  width:80%; max-width:320px;
+  padding:10px; margin:8px auto; display:block;
+  border-radius:8px; border:none;
 }
 
-.screen { display: none; }
-.screen.active { display: block; }
-
-ul { list-style: none; padding: 0; }
-li { margin: 8px 0; }
+.screen { display:none; }
+.screen.active { display:block; }
+.result { font-weight:bold; margin-top:10px; }
 </style>
 </head>
 
 <body>
 
-<header>
-<h1>⚡ VoltGuide Pro v11</h1>
-</header>
+<header><h1>⚡ VoltGuide Pro v13</h1></header>
 
 <main>
 
-<!-- HOME -->
 <section id="home" class="screen active">
-<button onclick="showScreen('voltage')">Voltage Drop</button>
-<button onclick="showScreen('fault')">Distance to Fault</button>
-<button onclick="showScreen('zs')">Max Zs Lookup</button>
-<button onclick="showScreen('certificate')">Generate EIC PDF</button>
-<button onclick="showScreen('history')">Saved Results</button>
+<button onclick="show('voltage')">Voltage Drop</button>
+<button onclick="show('fault')">Distance to Fault</button>
+<button onclick="show('zs')">Max Zs Lookup</button>
+<button onclick="show('fill')">Conduit Fill</button>
+<button onclick="show('bend')">Conduit Bending</button>
+<button onclick="show('cable')">Cable Size Calculator</button>
+<button onclick="show('history')">Saved Results</button>
 </section>
 
-<!-- VOLTAGE DROP -->
+<!-- Existing tools unchanged (same as v12) -->
+<!-- Voltage Drop -->
 <section id="voltage" class="screen">
-<h2>Voltage Drop Calculator</h2>
-
-<select id="cable">
-<option value="1.5">1.5 mm²</option>
-<option value="2.5">2.5 mm²</option>
-<option value="4">4 mm²</option>
-<option value="6">6 mm²</option>
+<h2>Voltage Drop</h2>
+<select id="cableSizeVD">
+<option value="1.5">1.5</option><option value="2.5">2.5</option>
+<option value="4">4</option><option value="6">6</option><option value="10">10</option>
 </select>
-
-<input id="length" type="number" placeholder="Length (m)">
-<input id="current" type="number" placeholder="Current (A)">
-
+<input id="lengthVD" type="number" placeholder="Length (m)">
+<input id="currentVD" type="number" placeholder="Current (A)">
 <button onclick="calcVoltage()">Calculate</button>
-<p id="voltageResult"></p>
-
-<button onclick="saveResult('Voltage Drop', voltageResult.textContent)">Save</button>
-<button onclick="showScreen('home')">Back</button>
+<p id="voltageResult" class="result"></p>
+<button onclick="save('Voltage Drop', voltageResult.textContent)">Save</button>
+<button onclick="show('home')">Back</button>
 </section>
 
-<!-- FAULT -->
+<!-- Fault -->
 <section id="fault" class="screen">
 <h2>Distance to Fault</h2>
-
-<input id="faultDrop" type="number" placeholder="Measured Voltage Drop (V)">
-<input id="faultRes" type="number" step="0.001" placeholder="Cable Resistance (Ω/m)">
-
+<input id="faultDrop" type="number" placeholder="Voltage Drop (V)">
+<input id="faultRes" type="number" placeholder="Resistance (Ω/m)">
 <button onclick="calcFault()">Calculate</button>
-<p id="faultResult"></p>
-
-<button onclick="saveResult('Fault Distance', faultResult.textContent)">Save</button>
-<button onclick="showScreen('home')">Back</button>
+<p id="faultResult" class="result"></p>
+<button onclick="save('Fault Distance', faultResult.textContent)">Save</button>
+<button onclick="show('home')">Back</button>
 </section>
 
-<!-- ZS -->
+<!-- Zs -->
 <section id="zs" class="screen">
-<h2>Max Zs Lookup</h2>
-
-<select id="breakerType">
-<option value="B">Type B</option>
-<option value="C">Type C</option>
-<option value="D">Type D</option>
-</select>
-
-<select id="breakerRating">
-<option>6</option><option>10</option><option>16</option>
-<option>20</option><option>32</option><option>40</option>
-<option>50</option><option>63</option>
-</select>
-
+<h2>Max Zs</h2>
+<select id="type"><option>B</option><option>C</option><option>D</option></select>
+<select id="rating"><option>6</option><option>10</option><option>16</option><option>20</option><option>32</option><option>40</option><option>50</option><option>63</option></select>
 <button onclick="calcZs()">Lookup</button>
-<p id="zsResult"></p>
-
-<button onclick="saveResult('Max Zs', zsResult.textContent)">Save</button>
-<button onclick="showScreen('home')">Back</button>
+<p id="zsResult" class="result"></p>
+<button onclick="save('Max Zs', zsResult.textContent)">Save</button>
+<button onclick="show('home')">Back</button>
 </section>
 
-<!-- CERTIFICATE -->
-<section id="certificate" class="screen">
-<h2>Electrical Installation Certificate (EIC)</h2>
-
-<input id="clientName" placeholder="Client Name">
-<input id="clientAddress" placeholder="Address">
-<input id="circuit" placeholder="Circuit Description">
-<input id="result" placeholder="Test Result">
-
-<button onclick="downloadCertificate()">Download EIC PDF</button>
-<button onclick="showScreen('home')">Back</button>
+<!-- Conduit Fill -->
+<section id="fill" class="screen">
+<h2>Conduit Fill %</h2>
+<input id="wireArea" type="number" placeholder="Area of one conductor">
+<input id="numWires" type="number" placeholder="Number of conductors">
+<input id="conduitArea" type="number" placeholder="Total conduit area">
+<button onclick="calcFill()">Calculate</button>
+<p id="fillResult" class="result"></p>
+<button onclick="save('Conduit Fill', fillResult.textContent)">Save</button>
+<button onclick="show('home')">Back</button>
 </section>
 
-<!-- HISTORY -->
+<!-- Bending -->
+<section id="bend" class="screen">
+<h2>Offset Bend</h2>
+<input id="offset" type="number" placeholder="Offset height">
+<select id="angle">
+<option value="5.8">10°</option>
+<option value="2.6">22.5°</option>
+<option value="2.0">30°</option>
+<option value="1.4">45°</option>
+<option value="1.2">60°</option>
+</select>
+<button onclick="calcOffset()">Calculate</button>
+<p id="offsetResult" class="result"></p>
+
+<h3>Rolling Offset</h3>
+<input id="rise" type="number" placeholder="Height">
+<input id="run" type="number" placeholder="Width">
+<button onclick="calcRoll()">Calculate</button>
+<p id="rollResult" class="result"></p>
+
+<button onclick="show('home')">Back</button>
+</section>
+
+<!-- NEW Cable Size Calculator -->
+<section id="cable" class="screen">
+<h2>Cable Size Calculator</h2>
+
+<input id="loadCurrent" type="number" placeholder="Load current (A)">
+<input id="loadLength" type="number" placeholder="Cable length (m)">
+
+<select id="derate">
+<option value="1">Normal installation</option>
+<option value="0.87">Insulation / grouping</option>
+<option value="0.75">High temperature</option>
+</select>
+
+<button onclick="calcCable()">Recommend Cable</button>
+<p id="cableResult" class="result"></p>
+
+<button onclick="save('Cable Size', cableResult.textContent)">Save</button>
+<button onclick="show('home')">Back</button>
+</section>
+
+<!-- History -->
 <section id="history" class="screen">
 <h2>Saved Results</h2>
-<ul id="historyList"></ul>
-
-<button onclick="clearHistory()">Clear All</button>
-<button onclick="showScreen('home')">Back</button>
+<ul id="list"></ul>
+<button onclick="clearAll()">Clear All</button>
+<button onclick="show('home')">Back</button>
 </section>
 
 </main>
 
 <script>
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  if (id === "history") loadHistory();
+function show(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+if(id==='history') load();
 }
 
 /* Voltage Drop */
-function calcVoltage() {
-  const cable = parseFloat(document.getElementById("cable").value);
-  const length = parseFloat(document.getElementById("length").value);
-  const current = parseFloat(document.getElementById("current").value);
-
-  const map = {1.5:0.0121, 2.5:0.00741, 4:0.00461, 6:0.00308};
-  if (!length || !current) return;
-
-  const vd = map[cable] * length * current;
-
-  document.getElementById("voltageResult").textContent =
-    "Voltage Drop: " + vd.toFixed(2) + " V";
+function calcVoltage(){
+const map={1.5:0.0121,2.5:0.00741,4:0.00461,6:0.00308,10:0.00183};
+const v=map[cableSizeVD.value]*lengthVD.value*currentVD.value;
+voltageResult.textContent="Voltage Drop: "+v.toFixed(2)+" V";
 }
 
-/* Fault Distance */
-function calcFault() {
-  const drop = parseFloat(document.getElementById("faultDrop").value);
-  const res = parseFloat(document.getElementById("faultRes").value);
-  if (!drop || !res) return;
-
-  document.getElementById("faultResult").textContent =
-    "Estimated Distance: " + (drop / res).toFixed(1) + " m";
+/* Fault */
+function calcFault(){
+faultResult.textContent="Distance: "+(faultDrop.value/faultRes.value).toFixed(1)+" m";
 }
 
-/* Max Zs */
-function calcZs() {
-  const type = document.getElementById("breakerType").value;
-  const rating = document.getElementById("breakerRating").value;
-
-  const table = {
-    B:{6:7.67,10:4.6,16:2.87,20:2.3,32:1.44,40:1.15,50:0.92,63:0.73},
-    C:{6:3.83,10:2.3,16:1.44,20:1.15,32:0.72,40:0.58,50:0.46,63:0.37},
-    D:{6:1.92,10:1.15,16:0.72,20:0.58,32:0.36,40:0.29,50:0.23,63:0.18}
-  };
-
-  document.getElementById("zsResult").textContent =
-    "Max Zs: " + table[type][rating] + " Ω";
+/* Zs */
+function calcZs(){
+const t={
+B:{6:7.67,10:4.6,16:2.87,20:2.3,32:1.44,40:1.15,50:0.92,63:0.73},
+C:{6:3.83,10:2.3,16:1.44,20:1.15,32:0.72,40:0.58,50:0.46,63:0.37},
+D:{6:1.92,10:1.15,16:0.72,20:0.58,32:0.36,40:0.29,50:0.23,63:0.18}};
+zsResult.textContent="Max Zs: "+t[type.value][rating.value]+" Ω";
 }
 
-/* Save History */
-function saveResult(type, text) {
-  if (!text) return;
-  const data = JSON.parse(localStorage.getItem("voltguide") || "[]");
-  data.push(type + ": " + text);
-  localStorage.setItem("voltguide", JSON.stringify(data));
+/* Fill */
+function calcFill(){
+const f=(wireArea.value*numWires.value)/conduitArea.value*100;
+fillResult.textContent="Fill: "+f.toFixed(1)+"%"+(f>40?" ⚠️ Over limit":" OK");
 }
 
-function loadHistory() {
-  const list = document.getElementById("historyList");
-  list.innerHTML = "";
-  const data = JSON.parse(localStorage.getItem("voltguide") || "[]");
-
-  data.forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    list.appendChild(li);
-  });
+/* Bending */
+function calcOffset(){
+offsetResult.textContent="Distance: "+(offset.value*angle.value).toFixed(2);
+}
+function calcRoll(){
+rollResult.textContent="Distance: "+Math.sqrt(rise.value**2+run.value**2).toFixed(2);
 }
 
-function clearHistory() {
-  localStorage.removeItem("voltguide");
-  loadHistory();
+/* NEW Cable selector */
+function calcCable(){
+const cables=[
+{size:"1.5 mm²",cap:16,vd:0.0121},
+{size:"2.5 mm²",cap:25,vd:0.00741},
+{size:"4 mm²",cap:32,vd:0.00461},
+{size:"6 mm²",cap:40,vd:0.00308},
+{size:"10 mm²",cap:63,vd:0.00183}
+];
+
+const I=loadCurrent.value*derate.value;
+const L=loadLength.value;
+
+for(const c of cables){
+const drop=c.vd*L*loadCurrent.value;
+if(I<=c.cap && drop<=11.5){
+cableResult.textContent="Recommended: "+c.size+" (Drop "+drop.toFixed(2)+" V)";
+return;
+}
+}
+cableResult.textContent="⚠️ Cable size >10 mm² required";
 }
 
-/* REAL EIC PDF */
-async function downloadCertificate() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  const name = document.getElementById("clientName").value;
-  const address = document.getElementById("clientAddress").value;
-  const circuit = document.getElementById("circuit").value;
-  const result = document.getElementById("result").value;
-
-  doc.setFontSize(18);
-  doc.text("Electrical Installation Certificate (EIC)", 20, 20);
-
-  doc.setFontSize(12);
-  doc.text("Client Name: " + name, 20, 40);
-  doc.text("Address: " + address, 20, 50);
-
-  doc.text("Circuit: " + circuit, 20, 70);
-  doc.text("Test Result: " + result, 20, 80);
-
-  doc.text("Generated by VoltGuide Pro", 20, 110);
-  doc.text(new Date().toLocaleDateString(), 150, 110);
-
-  doc.save("EIC-Certificate.pdf");
+/* Storage */
+function save(t,v){
+if(!v)return;
+let d=JSON.parse(localStorage.getItem("volt")||"[]");
+d.push(t+": "+v);
+localStorage.setItem("volt",JSON.stringify(d));
 }
+function load(){
+list.innerHTML="";
+(JSON.parse(localStorage.getItem("volt")||"[]"))
+.forEach(i=>{let li=document.createElement("li");li.textContent=i;list.appendChild(li);});
+}
+function clearAll(){localStorage.removeItem("volt");load();}
 </script>
 
 </body>
