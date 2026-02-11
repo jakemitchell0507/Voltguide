@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoltGuide Pro v14</title>
+<title>SparkysMate</title>
 
 <style>
 body {
@@ -39,7 +39,7 @@ input, select {
 
 <body>
 
-<header><h1>⚡ VoltGuide Pro v14</h1></header>
+<header><h1>⚡ SparkysMate</h1></header>
 
 <main>
 
@@ -234,8 +234,7 @@ localStorage.setItem("volt",JSON.stringify(d));
 
 function load(){
 list.innerHTML="";
-(JSON.parse(localStorage.getItem("volt")||"[]"))
-.forEach(i=>{
+(JSON.parse(localStorage.getItem("volt")||"[]")).forEach(i=>{
 let li=document.createElement("li");
 li.textContent=i;
 list.appendChild(li);
