@@ -1,225 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoltGuide Pro v10</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltGuide Pro v10</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-    }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
 
-    header {
-      background: #020617;
-      padding: 15px;
-    }
+header {
+  background: #020617;
+  padding: 15px;
+}
 
-    button {
-      display: block;
-      margin: 10px auto;
-      padding: 12px;
-      width: 80%;
-      max-width: 300px;
-      border: none;
-      border-radius: 10px;
-      background: #2563eb;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
+button {
+  display: block;
+  margin: 10px auto;
+  padding: 12px;
+  width: 80%;
+  max-width: 300px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    input, select {
-      width: 80%;
-      max-width: 300px;
-      padding: 10px;
-      margin: 8px auto;
-      display: block;
-      border-radius: 8px;
-      border: none;
-    }
+input, select {
+  width: 80%;
+  max-width: 300px;
+  padding: 10px;
+  margin: 8px auto;
+  display: block;
+  border-radius: 8px;
+  border: none;
+}
 
-    .screen { display: none; }
-    .active { display: block; }
+.screen { display: none; }
+.screen.active { display: block; }
 
-    ul { list-style: none; padding: 0; }
-    li { margin: 8px 0; }
-  </style>
+ul { list-style: none; padding: 0; }
+li { margin: 8px 0; }
+</style>
 </head>
+
 <body>
 
 <header>
-  <h1>⚡ VoltGuide Pro v10</h1>
+<h1>⚡ VoltGuide Pro v10</h1>
 </header>
 
 <main>
 
-  <!-- HOME -->
-  <section id="home" class="screen active">
-    <button onclick="show('voltage')">Voltage Drop</button>
-    <button onclick="show('fault')">Distance to Fault</button>
-    <button onclick="show('zs')">Max Zs Lookup</button>
-    <button onclick="show('certificate')">Test Certificate</button>
-    <button onclick="show('history')">Saved Results</button>
-  </section>
+<section id="home" class="screen active">
+<button onclick="showScreen('voltage')">Voltage Drop</button>
+<button onclick="showScreen('fault')">Distance to Fault</button>
+<button onclick="showScreen('zs')">Max Zs Lookup</button>
+<button onclick="showScreen('certificate')">Test Certificate</button>
+<button onclick="showScreen('history')">Saved Results</button>
+</section>
 
-  <!-- VOLTAGE DROP -->
-  <section id="voltage" class="screen">
-    <h2>Voltage Drop</h2>
+<section id="voltage" class="screen">
+<h2>Voltage Drop</h2>
 
-    <select id="cable">
-      <option value="1.5">1.5 mm²</option>
-      <option value="2.5">2.5 mm²</option>
-      <option value="4">4 mm²</option>
-      <option value="6">6 mm²</option>
-    </select>
+<select id="cable">
+<option value="1.5">1.5 mm²</option>
+<option value="2.5">2.5 mm²</option>
+<option value="4">4 mm²</option>
+<option value="6">6 mm²</option>
+</select>
 
-    <input id="length" type="number" placeholder="Length (m)">
-    <input id="current" type="number" placeholder="Current (A)">
+<input id="length" type="number" placeholder="Length (m)">
+<input id="current" type="number" placeholder="Current (A)">
 
-    <button onclick="calcVoltage()">Calculate</button>
-    <p id="voltageResult"></p>
+<button onclick="calcVoltage()">Calculate</button>
+<p id="voltageResult"></p>
 
-    <button onclick="save('Voltage Drop', voltageResult.textContent)">Save</button>
-    <button onclick="show('home')">Back</button>
-  </section>
+<button onclick="saveResult('Voltage Drop', voltageResult.textContent)">Save</button>
+<button onclick="showScreen('home')">Back</button>
+</section>
 
-  <!-- FAULT -->
-  <section id="fault" class="screen">
-    <h2>Distance to Fault</h2>
+<section id="fault" class="screen">
+<h2>Distance to Fault</h2>
 
-    <input id="faultDrop" type="number" placeholder="Voltage Drop (V)">
-    <input id="faultRes" type="number" step="0.001" placeholder="Resistance (Ω/m)">
+<input id="faultDrop" type="number" placeholder="Voltage Drop (V)">
+<input id="faultRes" type="number" step="0.001" placeholder="Resistance (Ω/m)">
 
-    <button onclick="calcFault()">Calculate</button>
-    <p id="faultResult"></p>
+<button onclick="calcFault()">Calculate</button>
+<p id="faultResult"></p>
 
-    <button onclick="save('Fault Distance', faultResult.textContent)">Save</button>
-    <button onclick="show('home')">Back</button>
-  </section>
+<button onclick="saveResult('Fault Distance', faultResult.textContent)">Save</button>
+<button onclick="showScreen('home')">Back</button>
+</section>
 
-  <!-- ZS -->
-  <section id="zs" class="screen">
-    <h2>Max Zs Lookup</h2>
+<section id="zs" class="screen">
+<h2>Max Zs Lookup</h2>
 
-    <select id="breakerType">
-      <option value="B">Type B</option>
-      <option value="C">Type C</option>
-      <option value="D">Type D</option>
-    </select>
+<select id="breakerType">
+<option value="B">Type B</option>
+<option value="C">Type C</option>
+<option value="D">Type D</option>
+</select>
 
-    <select id="breakerRating">
-      <option>6</option><option>10</option><option>16</option>
-      <option>20</option><option>32</option><option>40</option>
-      <option>50</option><option>63</option>
-    </select>
+<select id="breakerRating">
+<option>6</option><option>10</option><option>16</option>
+<option>20</option><option>32</option><option>40</option>
+<option>50</option><option>63</option>
+</select>
 
-    <button onclick="calcZs()">Lookup</button>
-    <p id="zsResult"></p>
+<button onclick="calcZs()">Lookup</button>
+<p id="zsResult"></p>
 
-    <button onclick="save('Max Zs', zsResult.textContent)">Save</button>
-    <button onclick="show('home')">Back</button>
-  </section>
+<button onclick="saveResult('Max Zs', zsResult.textContent)">Save</button>
+<button onclick="showScreen('home')">Back</button>
+</section>
 
-  <!-- CERTIFICATE -->
-  <section id="certificate" class="screen">
-    <h2>Test Certificate</h2>
+<section id="certificate" class="screen">
+<h2>Test Certificate</h2>
 
-    <input id="clientName" placeholder="Client Name">
-    <input id="clientAddress" placeholder="Address">
-    <input id="circuit" placeholder="Circuit">
-    <input id="result" placeholder="Result">
+<input id="clientName" placeholder="Client Name">
+<input id="clientAddress" placeholder="Address">
+<input id="circuit" placeholder="Circuit">
+<input id="result" placeholder="Result">
 
-    <button onclick="downloadCertificate()">Download Certificate</button>
-    <button onclick="show('home')">Back</button>
-  </section>
+<button onclick="downloadCertificate()">Download Certificate</button>
+<button onclick="showScreen('home')">Back</button>
+</section>
 
-  <!-- HISTORY -->
-  <section id="history" class="screen">
-    <h2>Saved Results</h2>
-    <ul id="historyList"></ul>
+<section id="history" class="screen">
+<h2>Saved Results</h2>
+<ul id="historyList"></ul>
 
-    <button onclick="clearHistory()">Clear All</button>
-    <button onclick="show('home')">Back</button>
-  </section>
+<button onclick="clearHistory()">Clear All</button>
+<button onclick="showScreen('home')">Back</button>
+</section>
 
 </main>
 
 <script>
-  function show(id) {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-    if (id === "history") loadHistory();
-  }
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if (id === "history") loadHistory();
+}
 
-  // Voltage Drop
-  function calcVoltage() {
-    const cable = parseFloat(document.getElementById("cable").value);
-    const length = parseFloat(document.getElementById("length").value);
-    const current = parseFloat(document.getElementById("current").value);
+function calcVoltage() {
+  const cable = parseFloat(document.getElementById("cable").value);
+  const length = parseFloat(document.getElementById("length").value);
+  const current = parseFloat(document.getElementById("current").value);
 
-    const map = {1.5:0.0121, 2.5:0.00741, 4:0.00461, 6:0.00308};
-    if (!length || !current) return;
+  const map = {1.5:0.0121, 2.5:0.00741, 4:0.00461, 6:0.00308};
+  if (!length || !current) return;
 
-    const vd = map[cable] * length * current;
-    voltageResult.textContent = "Voltage Drop: " + vd.toFixed(2) + " V";
-  }
+  const vd = map[cable] * length * current;
+  document.getElementById("voltageResult").textContent =
+    "Voltage Drop: " + vd.toFixed(2) + " V";
+}
 
-  // Fault Distance
-  function calcFault() {
-    const drop = parseFloat(faultDrop.value);
-    const res = parseFloat(faultRes.value);
-    if (!drop || !res) return;
+function calcFault() {
+  const drop = parseFloat(document.getElementById("faultDrop").value);
+  const res = parseFloat(document.getElementById("faultRes").value);
+  if (!drop || !res) return;
 
-    faultResult.textContent = "Estimated Distance: " + (drop/res).toFixed(1) + " m";
-  }
+  document.getElementById("faultResult").textContent =
+    "Estimated Distance: " + (drop / res).toFixed(1) + " m";
+}
 
-  // Max Zs
-  function calcZs() {
-    const type = breakerType.value;
-    const rating = breakerRating.value;
+function calcZs() {
+  const type = document.getElementById("breakerType").value;
+  const rating = document.getElementById("breakerRating").value;
 
-    const table = {
-      B:{6:7.67,10:4.6,16:2.87,20:2.3,32:1.44,40:1.15,50:0.92,63:0.73},
-      C:{6:3.83,10:2.3,16:1.44,20:1.15,32:0.72,40:0.58,50:0.46,63:0.37},
-      D:{6:1.92,10:1.15,16:0.72,20:0.58,32:0.36,40:0.29,50:0.23,63:0.18}
-    };
+  const table = {
+    B:{6:7.67,10:4.6,16:2.87,20:2.3,32:1.44,40:1.15,50:0.92,63:0.73},
+    C:{6:3.83,10:2.3,16:1.44,20:1.15,32:0.72,40:0.58,50:0.46,63:0.37},
+    D:{6:1.92,10:1.15,16:0.72,20:0.58,32:0.36,40:0.29,50:0.23,63:0.18}
+  };
 
-    zsResult.textContent = "Max Zs: " + table[type][rating] + " Ω";
-  }
+  document.getElementById("zsResult").textContent =
+    "Max Zs: " + table[type][rating] + " Ω";
+}
 
-  // Save history
-  function save(type, text) {
-    if (!text) return;
-    const data = JSON.parse(localStorage.getItem("voltguide") || "[]");
-    data.push(type + ": " + text);
-    localStorage.setItem("voltguide", JSON.stringify(data));
-  }
+function saveResult(type, text) {
+  if (!text) return;
+  const data = JSON.parse(localStorage.getItem("voltguide") || "[]");
+  data.push(type + ": " + text);
+  localStorage.setItem("voltguide", JSON.stringify(data));
+}
 
-  function loadHistory() {
-    const list = document.getElementById("historyList");
-    list.innerHTML = "";
-    const data = JSON.parse(localStorage.getItem("voltguide") || "[]");
+function loadHistory() {
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+  const data = JSON.parse(localStorage.getItem("voltguide") || "[]");
 
-    data.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      list.appendChild(li);
-    });
-  }
+  data.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  });
+}
 
-  function clearHistory() {
-    localStorage.removeItem("voltguide");
-    loadHistory();
-  }
+function clearHistory() {
+  localStorage.removeItem("voltguide");
+  loadHistory();
+}
 
-  // Certificate download
-  function downloadCertificate() {
-    const text = `
+function downloadCertificate() {
+  const text = `
 Electrical Test Certificate
 
 Client: ${clientName.value}
@@ -231,12 +224,12 @@ Result: ${result.value}
 Generated by VoltGuide Pro v10
 `;
 
-    const blob = new Blob([text], {type:"text/plain"});
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "certificate.txt";
-    link.click();
-  }
+  const blob = new Blob([text], {type:"text/plain"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "certificate.txt";
+  link.click();
+}
 </script>
 
 </body>
