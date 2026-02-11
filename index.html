@@ -11,76 +11,107 @@ body{
     color:#fff;
 }
 header{
-    padding:18px;
+    padding:24px;
     text-align:center;
-    font-size:22px;
-    font-weight:700;
+    font-size:26px;
+    font-weight:800;
     background:#111;
-    border-bottom:2px solid #ffd60a;
+    border-bottom:3px solid #ffd60a;
+    letter-spacing:1px;
 }
+
 .container{
-    padding:16px;
-    max-width:520px;
+    padding:20px;
+    max-width:540px;
     margin:auto;
 }
+
 .grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:12px;
+    gap:16px;
+    margin-bottom:20px;
 }
+
 .tile{
     background:#111;
-    padding:26px 10px;
+    padding:32px 12px;
     text-align:center;
-    border-radius:16px;
+    border-radius:18px;
     font-weight:700;
+    font-size:18px;
     border:2px solid #ffd60a;
     cursor:pointer;
+    transition: transform 0.2s, background 0.2s;
 }
+.tile:hover{
+    background:#222;
+    transform:scale(1.03);
+}
+
 .card{
     display:none;
     background:#111;
-    padding:18px;
-    margin-top:14px;
-    border-radius:16px;
+    padding:24px;
+    margin-top:16px;
+    border-radius:18px;
     border:1px solid #333;
+    box-shadow:0 4px 12px rgba(0,0,0,0.6);
 }
+
 input, select{
     width:100%;
-    padding:14px;
-    margin:6px 0;
-    border-radius:12px;
-    border:none;
-    font-size:16px;
-}
-select {
-    color: #000;
-    background: #ffd60a;
-    font-weight: 700;
-}
-select option {
-    color: #000;
-    background: #ffd60a;
-    font-weight: 700;
-}
-button{
-    width:100%;
-    padding:15px;
+    padding:16px;
+    margin:10px 0;
     border-radius:14px;
     border:none;
-    background:#ffd60a;
     font-size:17px;
+}
+
+select {
+    color:#000;
+    background:#ffd60a;
     font-weight:700;
 }
-.result{
-    margin-top:10px;
-    font-size:20px;
+
+select option {
+    color:#000;
+    background:#ffd60a;
     font-weight:700;
+}
+
+button{
+    width:100%;
+    padding:18px;
+    margin-top:12px;
+    border-radius:16px;
+    border:none;
+    background:#ffd60a;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+button:hover{
+    background:#e6c200;
+    transform:scale(1.02);
+}
+
+.result{
+    margin-top:16px;
+    font-size:22px;
+    font-weight:700;
+    line-height:1.4;
+    white-space:pre-line;
+    text-align:center;
 }
 </style>
 </head>
 <body>
+
 <header>⚡ VoltGuide Pro – UK</header>
+
 <div class="container">
 
 <div class="grid">
@@ -114,7 +145,7 @@ button{
 <div class="result" id="faultOut"></div>
 </div>
 
-<!-- Zs Lookup -->
+<!-- Max Zs Lookup -->
 <div id="zs" class="card">
 <h2>Max Zs Lookup</h2>
 <select id="type">
@@ -159,16 +190,20 @@ if(!r||!ohm)return;
 faultOut.innerText=(r/(2*ohm)).toFixed(1)+" m to fault";
 }
 
-function zsCalc(){
-let table={
-B:{6:7.67,10:6.2,16:3.83,20:3.07,25:2.44,32:1.92,40:1.54,50:1.22,63:0.96},
-C:{6:3.83,10:3.1,16:1.92,20:1.54,25:1.22,32:0.96,40:0.77,50:0.61,63:0.48},
-D:{6:1.92,10:1.55,16:0.96,20:0.77,25:0.61,32:0.48,40:0.38,50:0.31,63:0.24}
+// Verified Max Zs (BS 7671) and 80% recommended on-site limits
+const zsTable = {
+B: {6:7.67,10:4.37,16:2.73,20:2.19,25:1.75,32:1.37,40:1.09,50:0.87,63:0.69},
+C: {6:3.83,10:2.19,16:1.36,20:1.09,25:0.87,32:0.67,40:0.54,50:0.44,63:0.34},
+D: {6:1.92,10:1.09,16:0.67,20:0.54,25:0.44,32:0.33,40:0.27,50:0.22,63:0.17}
 };
+
+function zsCalc(){
 let t=type.value;
 let r=rating.value;
 if(!t||!r)return;
-zsOut.innerText="Max Zs: "+table[t][r]+" Ω";
+let designZs = zsTable[t][r];
+let onsiteZs = (designZs * 0.8).toFixed(2);
+zsOut.innerText = `Design Max Zs: ${designZs} Ω\nRecommended On-Site Max (80%): ${onsiteZs} Ω`;
 }
 </script>
 </body>
