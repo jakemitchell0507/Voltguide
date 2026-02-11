@@ -20,6 +20,7 @@ button {
   width:80%; max-width:320px;
   border:none; border-radius:10px;
   background:#2563eb; color:white; font-size:16px;
+  cursor:pointer;
 }
 
 input, select {
@@ -30,6 +31,7 @@ input, select {
 
 .screen { display:none; }
 .screen.active { display:block; }
+
 .result { font-weight:bold; margin-top:10px; }
 .small { font-size:13px; opacity:0.8; }
 </style>
@@ -41,6 +43,7 @@ input, select {
 
 <main>
 
+<!-- HOME -->
 <section id="home" class="screen active">
 <button onclick="show('voltage')">Voltage Drop</button>
 <button onclick="show('fault')">Distance to Fault</button>
@@ -83,10 +86,13 @@ input, select {
 <!-- Zs -->
 <section id="zs" class="screen">
 <h2>Max Zs</h2>
-<select id="type"><option>B</option><option>C</option><option>D</option></select>
+<select id="type">
+<option>B</option><option>C</option><option>D</option>
+</select>
 <select id="rating">
-<option>6</option><option>10</option><option>16</option><option>20</option>
-<option>32</option><option>40</option><option>50</option><option>63</option>
+<option>6</option><option>10</option><option>16</option>
+<option>20</option><option>32</option><option>40</option>
+<option>50</option><option>63</option>
 </select>
 <button onclick="calcZs()">Lookup</button>
 <p id="zsResult" class="result"></p>
@@ -106,11 +112,10 @@ input, select {
 <button onclick="show('home')">Back</button>
 </section>
 
-<!-- Bending -->
+<!-- Conduit Bending -->
 <section id="bend" class="screen">
 <h2>Conduit Bending</h2>
-
-<p class="small">All measurements in millimetres (mm)</p>
+<p class="small">All measurements are in millimetres (mm)</p>
 
 <h3>Offset Bend</h3>
 <input id="offset" type="number" placeholder="Offset height (mm)">
@@ -136,13 +141,10 @@ input, select {
 <!-- Cable Size -->
 <section id="cable" class="screen">
 <h2>Cable Size Calculator</h2>
-
 <input id="loadCurrent" type="number" placeholder="Load current (A)">
 <input id="loadLength" type="number" placeholder="Cable length (m)">
-
 <button onclick="calcCable()">Recommend Cable</button>
 <p id="cableResult" class="result"></p>
-
 <button onclick="save('Cable Size', cableResult.textContent)">Save</button>
 <button onclick="show('home')">Back</button>
 </section>
@@ -164,16 +166,19 @@ document.getElementById(id).classList.add('active');
 if(id==='history') load();
 }
 
+/* Voltage Drop */
 function calcVoltage(){
 const map={1.5:0.0121,2.5:0.00741,4:0.00461,6:0.00308,10:0.00183};
 const v=map[cableSizeVD.value]*lengthVD.value*currentVD.value;
 voltageResult.textContent="Voltage Drop: "+v.toFixed(2)+" V";
 }
 
+/* Fault */
 function calcFault(){
 faultResult.textContent="Distance: "+(faultDrop.value/faultRes.value).toFixed(1)+" m";
 }
 
+/* Zs */
 function calcZs(){
 const t={
 B:{6:7.67,10:4.6,16:2.87,20:2.3,32:1.44,40:1.15,50:0.92,63:0.73},
@@ -182,19 +187,21 @@ D:{6:1.92,10:1.15,16:0.72,20:0.58,32:0.36,40:0.29,50:0.23,63:0.18}};
 zsResult.textContent="Max Zs: "+t[type.value][rating.value]+" Ω";
 }
 
+/* Fill */
 function calcFill(){
 const f=(wireArea.value*numWires.value)/conduitArea.value*100;
 fillResult.textContent="Fill: "+f.toFixed(1)+"%"+(f>40?" ⚠️ Over limit":" OK");
 }
 
+/* Bending */
 function calcOffset(){
 offsetResult.textContent="Distance: "+(offset.value*angle.value).toFixed(2)+" mm";
 }
-
 function calcRoll(){
 rollResult.textContent="Distance: "+Math.sqrt(rise.value**2+run.value**2).toFixed(2)+" mm";
 }
 
+/* Cable recommendation — simplified */
 function calcCable(){
 const cables=[
 {size:"1.5 mm²",cap:16,vd:0.0121},
@@ -204,21 +211,22 @@ const cables=[
 {size:"10 mm²",cap:63,vd:0.00183}
 ];
 
-const I=loadCurrent.value;
-const L=loadLength.value;
+const I=Number(loadCurrent.value);
+const L=Number(loadLength.value);
 
 for(const c of cables){
 const drop=c.vd*L*I;
 if(I<=c.cap && drop<=11.5){
-cableResult.textContent="Recommended: "+c.size+" (Drop "+drop.toFixed(2)+" V)";
+cableResult.textContent=`Recommended: ${c.size} (Voltage drop ${drop.toFixed(2)} V)`;
 return;
 }
 }
-cableResult.textContent="⚠️ Cable size greater than 10 mm² required";
+cableResult.textContent="⚠️ Use cable larger than 10 mm²";
 }
 
+/* Storage */
 function save(t,v){
-if(!v)return;
+if(!v) return;
 let d=JSON.parse(localStorage.getItem("volt")||"[]");
 d.push(t+": "+v);
 localStorage.setItem("volt",JSON.stringify(d));
@@ -234,7 +242,10 @@ list.appendChild(li);
 });
 }
 
-function clearAll(){localStorage.removeItem("volt"); load();}
+function clearAll(){
+localStorage.removeItem("volt");
+load();
+}
 </script>
 
 </body>
