@@ -5,6 +5,194 @@
 <title>VoltGuide Pro</title>
 
 <style>
+body{
+    margin:0;
+    font-family:-apple-system, sans-serif;
+    background:#000;
+    color:#fff;
+}
+
+header{
+    padding:18px;
+    text-align:center;
+    font-size:22px;
+    font-weight:700;
+    background:#111;
+    border-bottom:2px solid #ffd60a;
+}
+
+.container{
+    padding:16px;
+    max-width:520px;
+    margin:auto;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.tile{
+    background:#111;
+    padding:26px 10px;
+    text-align:center;
+    border-radius:16px;
+    font-weight:700;
+    border:2px solid #ffd60a;
+}
+
+.card{
+    display:none;
+    background:#111;
+    padding:18px;
+    margin-top:14px;
+    border-radius:16px;
+    border:1px solid #333;
+}
+
+input,select{
+    width:100%;
+    padding:14px;
+    margin:6px 0;
+    border-radius:12px;
+    border:none;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    border-radius:14px;
+    border:none;
+    background:#ffd60a;
+    font-size:17px;
+    font-weight:700;
+}
+
+.result{
+    margin-top:10px;
+    font-size:20px;
+    font-weight:700;
+}
+</style>
+</head>
+
+<body>
+
+<header>⚡ VoltGuide Pro – UK</header>
+
+<div class="container">
+
+<div class="grid">
+<div class="tile" onclick="show('vd')">Voltage Drop</div>
+<div class="tile" onclick="show('fault')">Distance to Fault</div>
+<div class="tile" onclick="show('zs')">Max Zs</div>
+<div class="tile" onclick="show('eic')">Minor Works</div>
+</div>
+
+<!-- Voltage Drop -->
+<div id="vd" class="card">
+<h2>Voltage Drop</h2>
+<input id="len" placeholder="Length (m)">
+<input id="amps" placeholder="Current (A)">
+<select id="cable">
+<option value="">Cable size</option>
+<option value="7.3">1.5 mm²</option>
+<option value="4.4">2.5 mm²</option>
+<option value="2.8">4 mm²</option>
+<option value="1.8">6 mm²</option>
+</select>
+<button onclick="vdCalc()">Calculate</button>
+<div class="result" id="vdOut"></div>
+</div>
+
+<!-- Distance to Fault -->
+<div id="fault" class="card">
+<h2>Distance to Fault</h2>
+<input id="r12" placeholder="Measured R1+R2 (Ω)">
+<input id="resm" placeholder="Cable Ω per metre">
+<button onclick="faultCalc()">Calculate</button>
+<div class="result" id="faultOut"></div>
+</div>
+
+<!-- Zs Lookup -->
+<div id="zs" class="card">
+<h2>Max Zs Lookup</h2>
+
+<select id="type">
+<option value="">Breaker Type</option>
+<option value="B">Type B</option>
+<option value="C">Type C</option>
+<option value="D">Type D</option>
+</select>
+
+<select id="rating">
+<option value="">Breaker Rating</option>
+<option value="6">6A</option>
+<option value="16">16A</option>
+<option value="32">32A</option>
+</select>
+
+<button onclick="zsCalc()">Show Max Zs</button>
+<div class="result" id="zsOut"></div>
+</div>
+
+<!-- Minor Works -->
+<div id="eic" class="card">
+<h2>Minor Works Steps</h2>
+<button onclick="eicCalc()">Show</button>
+<div class="result" id="eicOut"></div>
+</div>
+
+</div>
+
+<script>
+function show(id){
+document.querySelectorAll('.card').forEach(c=>c.style.display='none');
+document.getElementById(id).style.display='block';
+}
+
+function vdCalc(){
+let L=len.value, I=amps.value, mV=cable.value;
+if(!L||!I||!mV)return;
+vdOut.innerText=((mV*I*L)/1000).toFixed(2)+" V drop";
+}
+
+function faultCalc(){
+let r=r12.value, ohm=resm.value;
+if(!r||!ohm)return;
+faultOut.innerText=(r/(2*ohm)).toFixed(1)+" m to fault";
+}
+
+function zsCalc(){
+let table={
+B:{6:7.67,16:3.83,32:1.92},
+C:{6:3.83,16:1.92,32:0.96},
+D:{6:1.92,16:0.96,32:0.48}
+};
+
+let t=type.value;
+let r=rating.value;
+
+if(!t||!r)return;
+
+zsOut.innerText="Max Zs: "+table[t][r]+" Ω";
+}
+
+function eicCalc(){
+eicOut.innerText="Isolate → Polarity → Zs → Record → Sign";
+}
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltGuide Pro</title>
+
+<style>
 body {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     margin: 0;
