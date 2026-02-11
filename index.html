@@ -1,210 +1,220 @@
-<!DOCTYPE html>
+Voltguide/
+│── index.html
+│── style.css
+│── app.js<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoltGuide Pro</title>
-<style>
-body{
-    margin:0;
-    font-family:-apple-system, sans-serif;
-    background:#000;
-    color:#fff;
-}
-header{
-    padding:24px;
-    text-align:center;
-    font-size:26px;
-    font-weight:800;
-    background:#111;
-    border-bottom:3px solid #ffd60a;
-    letter-spacing:1px;
-}
-
-.container{
-    padding:20px;
-    max-width:540px;
-    margin:auto;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
-    margin-bottom:20px;
-}
-
-.tile{
-    background:#111;
-    padding:32px 12px;
-    text-align:center;
-    border-radius:18px;
-    font-weight:700;
-    font-size:18px;
-    border:2px solid #ffd60a;
-    cursor:pointer;
-    transition: transform 0.2s, background 0.2s;
-}
-.tile:hover{
-    background:#222;
-    transform:scale(1.03);
-}
-
-.card{
-    display:none;
-    background:#111;
-    padding:24px;
-    margin-top:16px;
-    border-radius:18px;
-    border:1px solid #333;
-    box-shadow:0 4px 12px rgba(0,0,0,0.6);
-}
-
-input, select{
-    width:100%;
-    padding:16px;
-    margin:10px 0;
-    border-radius:14px;
-    border:none;
-    font-size:17px;
-}
-
-select {
-    color:#000;
-    background:#ffd60a;
-    font-weight:700;
-}
-
-select option {
-    color:#000;
-    background:#ffd60a;
-    font-weight:700;
-}
-
-button{
-    width:100%;
-    padding:18px;
-    margin-top:12px;
-    border-radius:16px;
-    border:none;
-    background:#ffd60a;
-    font-size:18px;
-    font-weight:700;
-    cursor:pointer;
-    transition: background 0.2s, transform 0.2s;
-}
-
-button:hover{
-    background:#e6c200;
-    transform:scale(1.02);
-}
-
-.result{
-    margin-top:16px;
-    font-size:22px;
-    font-weight:700;
-    line-height:1.4;
-    white-space:pre-line;
-    text-align:center;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VoltGuide Pro v8</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header>⚡ VoltGuide Pro – UK</header>
+<header>
+  <h1>⚡ VoltGuide Pro v8</h1>
+</header>
 
-<div class="container">
+<main id="app">
 
-<div class="grid">
-<div class="tile" onclick="show('vd')">Voltage Drop</div>
-<div class="tile" onclick="show('fault')">Distance to Fault</div>
-<div class="tile" onclick="show('zs')">Max Zs</div>
-</div>
+  <!-- HOME -->
+  <section class="screen active" id="home">
+    <button onclick="showScreen('voltage')">Voltage Drop</button>
+    <button onclick="showScreen('fault')">Distance to Fault</button>
+    <button onclick="showScreen('zs')">Max Zs Lookup</button>
+    <button onclick="showScreen('history')">Saved Results</button>
+  </section>
 
-<!-- Voltage Drop -->
-<div id="vd" class="card">
-<h2>Voltage Drop</h2>
-<input id="len" placeholder="Length (m)">
-<input id="amps" placeholder="Current (A)">
-<select id="cable">
-<option value="" disabled selected hidden>Cable Size</option>
-<option value="7.3">1.5 mm²</option>
-<option value="4.4">2.5 mm²</option>
-<option value="2.8">4 mm²</option>
-<option value="1.8">6 mm²</option>
-</select>
-<button onclick="vdCalc()">Calculate</button>
-<div class="result" id="vdOut"></div>
-</div>
+  <!-- VOLTAGE DROP -->
+  <section class="screen" id="voltage">
+    <h2>Voltage Drop Calculator</h2>
 
-<!-- Distance to Fault -->
-<div id="fault" class="card">
-<h2>Distance to Fault</h2>
-<input id="r12" placeholder="Measured R1+R2 (Ω)">
-<input id="resm" placeholder="Cable Ω per metre">
-<button onclick="faultCalc()">Calculate</button>
-<div class="result" id="faultOut"></div>
-</div>
+    <label>Cable Size (mm²)</label>
+    <select id="cable">
+      <option value="1.5">1.5</option>
+      <option value="2.5">2.5</option>
+      <option value="4">4</option>
+      <option value="6">6</option>
+    </select>
 
-<!-- Max Zs Lookup -->
-<div id="zs" class="card">
-<h2>Max Zs Lookup</h2>
-<select id="type">
-<option value="" disabled selected hidden>Breaker Type</option>
-<option value="B">Type B</option>
-<option value="C">Type C</option>
-<option value="D">Type D</option>
-</select>
-<select id="rating">
-<option value="" disabled selected hidden>Breaker Rating</option>
-<option value="6">6A</option>
-<option value="10">10A</option>
-<option value="16">16A</option>
-<option value="20">20A</option>
-<option value="25">25A</option>
-<option value="32">32A</option>
-<option value="40">40A</option>
-<option value="50">50A</option>
-<option value="63">63A</option>
-</select>
-<button onclick="zsCalc()">Show Max Zs</button>
-<div class="result" id="zsOut"></div>
-</div>
+    <label>Length (m)</label>
+    <input type="number" id="length" />
 
-</div>
+    <label>Current (A)</label>
+    <input type="number" id="current" />
 
-<script>
-function show(id){
-document.querySelectorAll('.card').forEach(c=>c.style.display='none');
-document.getElementById(id).style.display='block';
-}
+    <button onclick="calcVoltage()">Calculate</button>
 
-function vdCalc(){
-let L=len.value, I=amps.value, mV=cable.value;
-if(!L||!I||!mV)return;
-vdOut.innerText=((mV*I*L)/1000).toFixed(2)+" V drop";
-}
+    <p id="voltageResult"></p>
+    <button onclick="saveResult('Voltage Drop', voltageResult.textContent)">Save</button>
+    <button onclick="showScreen('home')">Back</button>
+  </section>
 
-function faultCalc(){
-let r=r12.value, ohm=resm.value;
-if(!r||!ohm)return;
-faultOut.innerText=(r/(2*ohm)).toFixed(1)+" m to fault";
-}
+  <!-- DISTANCE TO FAULT -->
+  <section class="screen" id="fault">
+    <h2>Distance to Fault</h2>
 
-// Verified Max Zs (BS 7671) and 80% recommended on-site limits
-const zsTable = {
-B: {6:7.67,10:4.37,16:2.73,20:2.19,25:1.75,32:1.37,40:1.09,50:0.87,63:0.69},
-C: {6:3.83,10:2.19,16:1.36,20:1.09,25:0.87,32:0.67,40:0.54,50:0.44,63:0.34},
-D: {6:1.92,10:1.09,16:0.67,20:0.54,25:0.44,32:0.33,40:0.27,50:0.22,63:0.17}
-};
+    <label>Measured Voltage Drop (V)</label>
+    <input type="number" id="faultDrop" />
 
-function zsCalc(){
-let t=type.value;
-let r=rating.value;
-if(!t||!r)return;
-let designZs = zsTable[t][r];
-let onsiteZs = (designZs * 0.8).toFixed(2);
-zsOut.innerText = `Design Max Zs: ${designZs} Ω\nRecommended On-Site Max (80%): ${onsiteZs} Ω`;
-}
-</script>
+    <label>Cable Resistance (Ω/m)</label>
+    <input type="number" id="faultRes" step="0.001"/>
+
+    <button onclick="calcFault()">Calculate</button>
+
+    <p id="faultResult"></p>
+    <button onclick="saveResult('Fault Distance', faultResult.textContent)">Save</button>
+    <button onclick="showScreen('home')">Back</button>
+  </section>
+
+  <!-- MAX ZS -->
+  <section class="screen" id="zs">
+    <h2>Max Zs Lookup</h2>
+
+    <label>Breaker Type</label>
+    <select id="breakerType">
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+    </select>
+
+    <label>Rating (A)</label>
+    <select id="breakerRating">
+      <option>6</option><option>10</option><option>16</option>
+      <option>20</option><option>32</option><option>40</option>
+      <option>50</option><option>63</option>
+    </select>
+
+    <button onclick="calcZs()">Lookup</button>
+
+    <p id="zsResult"></p>
+    <button onclick="saveResult('Max Zs', zsResult.textContent)">Save</button>
+    <button onclick="showScreen('home')">Back</button>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="screen" id="history">
+    <h2>Saved Results</h2>
+    <ul id="historyList"></ul>
+    <button onclick="clearHistory()">Clear All</button>
+    <button onclick="showScreen('home')">Back</button>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
 </body>
-</html>
+</html>body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
+
+header {
+  background: #020617;
+  padding: 15px;
+}
+
+button {
+  display: block;
+  margin: 10px auto;
+  padding: 12px;
+  width: 80%;
+  max-width: 300px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+}
+
+input, select {
+  width: 80%;
+  max-width: 300px;
+  padding: 10px;
+  margin: 8px auto;
+  display: block;
+  border-radius: 8px;
+  border: none;
+}
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+ul { list-style: none; padding: 0; }
+li { margin: 8px 0; }function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if (id === "history") loadHistory();
+}
+
+/* VOLTAGE DROP */
+function calcVoltage() {
+  const cable = parseFloat(cableSize());
+  const length = parseFloat(lengthVal());
+  const current = parseFloat(currentVal());
+
+  if (!length || !current) return;
+
+  const resistanceMap = {1.5: 0.0121, 2.5: 0.00741, 4: 0.00461, 6: 0.00308};
+  const vd = resistanceMap[cable] * length * current;
+
+  voltageResult.textContent = `Voltage Drop: ${vd.toFixed(2)} V`;
+}
+
+function cableSize(){ return document.getElementById("cable").value; }
+function lengthVal(){ return document.getElementById("length").value; }
+function currentVal(){ return document.getElementById("current").value; }
+
+/* FAULT DISTANCE */
+function calcFault() {
+  const drop = parseFloat(faultDrop.value);
+  const res = parseFloat(faultRes.value);
+
+  if (!drop || !res) return;
+
+  const distance = drop / res;
+  faultResult.textContent = `Estimated Distance: ${distance.toFixed(1)} m`;
+}
+
+/* MAX ZS */
+function calcZs() {
+  const type = breakerType.value;
+  const rating = breakerRating.value;
+
+  const table = {
+    B: {6:7.67,10:4.6,16:2.87,20:2.3,32:1.44,40:1.15,50:0.92,63:0.73},
+    C: {6:3.83,10:2.3,16:1.44,20:1.15,32:0.72,40:0.58,50:0.46,63:0.37},
+    D: {6:1.92,10:1.15,16:0.72,20:0.58,32:0.36,40:0.29,50:0.23,63:0.18}
+  };
+
+  zsResult.textContent = `Max Zs: ${table[type][rating]} Ω`;
+}
+
+/* HISTORY */
+function saveResult(type, text) {
+  if (!text) return;
+
+  const history = JSON.parse(localStorage.getItem("voltguide")) || [];
+  history.push(`${type}: ${text}`);
+  localStorage.setItem("voltguide", JSON.stringify(history));
+}
+
+function loadHistory() {
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+
+  const history = JSON.parse(localStorage.getItem("voltguide")) || [];
+  history.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  });
+}
+
+function clearHistory() {
+  localStorage.removeItem("voltguide");
+  loadHistory();
+}
